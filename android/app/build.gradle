@@ -1,0 +1,107 @@
+
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
+if (flutterVersionCode == null) {
+    flutterVersionCode = '1'
+}
+
+def flutterVersionName = localProperties.getProperty('flutter.versionName')
+if (flutterVersionName == null) {
+    flutterVersionName = '1.0'
+}
+
+android {
+
+    namespace "com.example.masthore"
+    compileSdkVersion flutter.compileSdkVersion
+    ndkVersion flutter.ndkVersion
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    defaultConfig {
+        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+        applicationId "com.example.masthore"
+        // You can update the following values to match your application needs.
+        // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
+        // minSdkVersion flutter.minSdkVersion
+        minSdkVersion 29
+        // targetSdkVersion flutter.targetSdkVersion
+        targetSdkVersion 31
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
+        ndk {
+            abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
+        }
+    }
+
+    buildTypes {
+        release {
+            // TODO: Add your own signing config for the release build.
+            // Signing with the debug keys for now, so `flutter run --release` works.
+            signingConfig signingConfigs.debug
+        }
+    }
+}
+
+flutter {
+    source '../..'
+}
+
+dependencies {
+implementation 'androidx.annotation:annotation:+'
+
+}
+
+[
+    new Tuple2('Debug', ''),
+    new Tuple2('Profile', '--release'),
+    new Tuple2('Release', '--release')
+].each {
+    def taskPostfix = it.first
+    def profileMode = it.second
+    tasks.whenTaskAdded { task ->
+        if (task.name == "javaPreCompile$taskPostfix") {
+            task.dependsOn "cargoBuild$taskPostfix"
+        }
+    }
+    tasks.register("cargoBuild$taskPostfix", Exec) {
+        // Until https://github.com/bbqsrc/cargo-ndk/pull/13 is merged,
+        // this workaround is necessary.
+
+        def ndk_command = """cargo ndk \
+            -t armeabi-v7a -t arm64-v8a -t x86_64 -t x86 \
+            -o ../android/app/src/main/jniLibs build $profileMode"""
+
+        workingDir "../../native"
+        environment "ANDROID_NDK_HOME", "$ANDROID_NDK"
+        if (org.gradle.nativeplatform.platform.internal.DefaultNativePlatform.currentOperatingSystem.isWindows()) {
+            commandLine 'cmd', '/C', ndk_command
+        } else {
+            commandLine 'sh', '-c', ndk_command
+        }
+    }
+}
