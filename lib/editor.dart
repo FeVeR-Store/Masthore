@@ -8,7 +8,7 @@ import 'package:get/get.dart';
 import 'package:keyboard_height_plugin/keyboard_height_plugin.dart';
 import 'package:latext/latext.dart';
 import 'package:masthore/bottom_bar.dart';
-import 'package:masthore/graph.dart';
+import 'package:masthore/libs/expression.dart';
 import 'package:masthore/libs/rust_api.dart';
 import 'package:masthore/main.dart';
 import 'package:flutter_xlider/flutter_xlider.dart';
@@ -18,16 +18,16 @@ class Editor extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Size size = MediaQuery.of(context).size;
-    return GetBuilder<GraphController>(
+    return GetBuilder<ExpressionController>(
         id: "constant-editor",
-        init: GraphController(),
+        init: ExpressionController(),
         builder: (_) {
           return Padding(
               padding: const EdgeInsets.only(top: 30),
               child: ListView(
                 // controller: ScrollController(),
                 children: [
-                  EditorLatexPanel(graphController: _),
+                  EditorLatexPanel(exp: _),
                   ..._.expressionContext.constant.map((e) => ConstantInput(
                       identity: e.identity, value: e.value, constant: e))
                 ],
@@ -37,17 +37,17 @@ class Editor extends StatelessWidget {
 }
 
 class EditorLatexPanel extends StatelessWidget {
-  final GraphController graphController;
-  const EditorLatexPanel({super.key, required this.graphController});
+  final ExpressionController exp;
+  const EditorLatexPanel({super.key, required this.exp});
   @override
   Widget build(BuildContext context) {
     Get.find<BottomBarController>()
         .setGetLatexHeight(() => context.size!.height);
     return Center(
-        child: graphController.expressionContext.expression != null
+        child: exp.expressionContext.expression != null
             ? LaTexT(
                 laTeXCode: Text(
-                graphController.expressionContext.expression!.latexString,
+                exp.expressionContext.expression!.latexString,
                 style: const TextStyle(fontSize: 22),
               ))
             : FilledButton.icon(
@@ -205,7 +205,8 @@ class ConstantInputSlider extends StatelessWidget {
   Widget build(BuildContext context) {
     Get.find<BottomBarController>()
         .setGetSliderHeight(() => context.size!.height);
-    GraphController expressionController = Get.find<GraphController>();
+    ExpressionController expressionController =
+        Get.find<ExpressionController>();
     double oldValue = value;
     int toFixed = constant.step.toString().split(".")[1].length;
     return Container(
@@ -346,7 +347,7 @@ class Input extends StatelessWidget {
                           dy < res.screenHeight - res.keyboardHeight + 10) {
                         focusNode.requestFocus();
                       } else {
-                        textController.text = Get.find<GraphController>()
+                        textController.text = Get.find<ExpressionController>()
                             .getConstant(identity)
                             .toString();
                         inputController.changeReadonly(identity, true);
@@ -381,7 +382,8 @@ class Input extends StatelessWidget {
                             ? valString.replaceFirst(".0", "")
                             : valString;
                       }
-                      Get.find<GraphController>().changeConstant(identity, val);
+                      Get.find<ExpressionController>()
+                          .changeConstant(identity, val);
                     }
                     oldValue = value;
                   },
@@ -405,11 +407,12 @@ class Input extends StatelessWidget {
                       padding: const EdgeInsets.only(right: 15),
                       child: IconButton(
                           onPressed: () {
-                            Get.find<GraphController>()
+                            Get.find<ExpressionController>()
                                 .changeConstantToDefault(identity);
-                            textController.text = Get.find<GraphController>()
-                                .getConstant(identity)
-                                .toString();
+                            textController.text =
+                                Get.find<ExpressionController>()
+                                    .getConstant(identity)
+                                    .toString();
                           },
                           icon: const Icon(Icons.restart_alt_outlined)),
                     ),

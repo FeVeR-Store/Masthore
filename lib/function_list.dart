@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:latext/latext.dart';
-import 'package:masthore/graph.dart';
+import 'package:masthore/libs/expression.dart';
 import 'package:masthore/libs/rust_api.dart';
 import 'package:masthore/main.dart';
 
@@ -109,8 +109,9 @@ class MarkedItemBar extends StatelessWidget {
                                 },
                                 child: ActionChip(
                                   onPressed: () {
-                                    Get.find<GraphController>().changeFunction(
-                                        _.getExpression(e['name']!));
+                                    Get.find<ExpressionController>()
+                                        .changeFunction(
+                                            _.getExpression(e['name']!));
                                   },
                                   // padding: const EdgeInsets.all(),
                                   shape: RoundedRectangleBorder(
@@ -205,7 +206,7 @@ class SingleExpression extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
             onTap: () {
-              Get.find<GraphController>().changeFunction(expression);
+              Get.find<ExpressionController>().changeFunction(expression);
             },
             child: ListTile(
               leading: CircleAvatar(

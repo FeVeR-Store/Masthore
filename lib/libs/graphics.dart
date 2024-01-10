@@ -4,7 +4,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:masthore/bottom_bar.dart';
-import 'package:masthore/graph.dart';
 import 'package:masthore/libs/expression.dart';
 import 'package:masthore/libs/painter.dart';
 import 'package:masthore/libs/rust_api.dart';
@@ -25,7 +24,7 @@ class Range {
   Range(this.min, this.max);
 }
 
-Graphics newFunction(ExpressionContext context, double width, double height,
+Graphic newFunction(ExpressionContext context, double width, double height,
     Offset offset, double scale) {
   scale = pow(2, (scale - 1)).toDouble();
   double unitLength = min(width, height) / 7 * scale;
@@ -52,7 +51,7 @@ Graphics newFunction(ExpressionContext context, double width, double height,
       constantProvider: context.constant,
       changeContext: oldId != context.id);
   if (calcReturnForDart.constants.isNotEmpty) {
-    Get.find<GraphController>().setConstants(calcReturnForDart.constants);
+    Get.find<ExpressionController>().setConstants(calcReturnForDart.constants);
     oldId = context.id;
   }
   List<double> result = calcReturnForDart.result;
@@ -80,7 +79,7 @@ double degreeToRadian(double degree) {
   return degree * (3.141592653589793 / 180.0);
 }
 
-Graphics newArrow(double degree, Offset position, Paint paint) {
+Graphic newArrow(double degree, Offset position, Paint paint) {
   Path path = Path()
     ..moveTo(-5, -10)
     ..lineTo(0, 0)
@@ -155,7 +154,7 @@ double findMagnification(double magnification) {
   }
 }
 
-Graphics newGrid(double width, double height, double scale, Offset offset_,
+Graphic newGrid(double width, double height, double scale, Offset offset_,
     double gridWidth, bool withTick, Paint Function() paint) {
   final double statusBarHeight =
       MediaQuery.of(globalKey.currentContext!).padding.top;
@@ -187,7 +186,7 @@ Graphics newGrid(double width, double height, double scale, Offset offset_,
   while (gridWidth < $gridWidth) {
     gridWidth *= 2;
   }
-  List<Graphics> list = [Graphics(type: GraphicsTypes.path)];
+  List<Graphic> list = [Graphic(type: GraphicsTypes.path)];
 
   int magnification = scale.floor();
   path.moveTo(0, 0);
@@ -288,7 +287,7 @@ Graphics newGrid(double width, double height, double scale, Offset offset_,
   return newMulti(list);
 }
 
-Graphics newAxis(double width, double height, Offset offset, double xUnitLength,
+Graphic newAxis(double width, double height, Offset offset, double xUnitLength,
     double yUnitLength) {
   Path path = Path()
     ..moveTo(-width - offset.dx, 0)
@@ -323,7 +322,7 @@ class TextGraphicsStyle {
       this.direction = TextDirection.ltr});
 }
 
-class Graphics {
+class Graphic {
   final GraphicsTypes type;
   String? content;
   TextGraphicsStyle? textGraphicsStyle;
@@ -333,8 +332,8 @@ class Graphics {
   Offset? point;
   Paint Function()? paint;
   List<Offset>? points;
-  List<Graphics>? graphics;
-  Graphics({
+  List<Graphic>? graphics;
+  Graphic({
     required this.type,
     this.paint,
     this.content,
@@ -348,31 +347,31 @@ class Graphics {
   });
 }
 
-Graphics newText(
+Graphic newText(
     String content, Offset point, TextGraphicsStyle textGraphicsStyle) {
-  return Graphics(
+  return Graphic(
       type: GraphicsTypes.text,
       content: content,
       point: point,
       textGraphicsStyle: textGraphicsStyle);
 }
 
-Graphics newLine(Offset start, Offset end) {
-  return Graphics(type: GraphicsTypes.line, lineStart: start, lineEnd: end);
+Graphic newLine(Offset start, Offset end) {
+  return Graphic(type: GraphicsTypes.line, lineStart: start, lineEnd: end);
 }
 
-Graphics newPath(Path path, Paint Function() paint) {
-  return Graphics(type: GraphicsTypes.path, path: path, paint: paint);
+Graphic newPath(Path path, Paint Function() paint) {
+  return Graphic(type: GraphicsTypes.path, path: path, paint: paint);
 }
 
-Graphics newPoints(List<Offset> points, Paint Function() paint) {
-  return Graphics(type: GraphicsTypes.point, points: points, paint: paint);
+Graphic newPoints(List<Offset> points, Paint Function() paint) {
+  return Graphic(type: GraphicsTypes.point, points: points, paint: paint);
 }
 
-Graphics newMulti(List<Graphics> graphics) {
-  return Graphics(type: GraphicsTypes.multi, graphics: graphics);
+Graphic newMulti(List<Graphic> graphics) {
+  return Graphic(type: GraphicsTypes.multi, graphics: graphics);
 }
 
-Graphics empty() {
-  return Graphics(type: GraphicsTypes.empty);
+Graphic empty() {
+  return Graphic(type: GraphicsTypes.empty);
 }

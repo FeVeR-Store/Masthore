@@ -4,7 +4,7 @@ import 'package:gesture_x_detector/gesture_x_detector.dart';
 import 'package:get/get.dart';
 import 'package:masthore/editor.dart';
 import 'package:masthore/function_list.dart';
-import 'package:masthore/graph.dart';
+import 'package:masthore/libs/expression.dart';
 import 'package:masthore/main.dart';
 
 class BottomBarController extends GetxController {
@@ -17,7 +17,7 @@ class BottomBarController extends GetxController {
   late double Function() getLatexHeight;
   late double Function() getSliderHeight;
   late Size screen;
-  late double minHeight;
+  late double _minHeight;
   bool transparent = false;
 
   @override
@@ -28,12 +28,16 @@ class BottomBarController extends GetxController {
         BottomBarWithSheetController(initialIndex: 0, sheetOpened: true);
   }
 
-  void updateScreen(Size screen) {
+  void init(Size screen) {
     if (screen.width == 0 || screen.height == 0) {
       return;
     }
     this.screen = screen;
-    minHeight = screen.height * .7 - 95;
+    _minHeight = screen.height * .7 - 95;
+  }
+
+  void shrink() {
+    setTop(_minHeight);
   }
 
   void setTransparent(bool state) {
@@ -60,15 +64,15 @@ class BottomBarController extends GetxController {
 
   void changeTopByDrag(double y) {
     if (currtentView != 0 &&
-        Get.find<GraphController>().expressionContext.expression != null &&
+        Get.find<ExpressionController>().expressionContext.expression != null &&
         Get.find<ConstantInputController>().showSlider) {
       return;
     }
     cumulative += y;
     if (cumulative.abs() > screen.height * .15) {
       top = top + cumulative;
-      if (top >= minHeight) {
-        top = minHeight;
+      if (top >= _minHeight) {
+        top = _minHeight;
       }
       update();
       cumulative = 0;
@@ -77,7 +81,7 @@ class BottomBarController extends GetxController {
 
   void changeView(int id) {
     currtentView = id;
-    if (top >= minHeight - 200) {
+    if (top >= _minHeight - 200) {
       top = 0;
     }
     update();

@@ -1,15 +1,15 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:get/get.dart';
 import 'package:latext/latext.dart';
-import 'package:masthore/graph.dart';
+import 'package:masthore/libs/expression.dart';
 
 class BottomBar extends StatelessWidget {
   const BottomBar({super.key});
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<GraphController>(
+    return GetBuilder<ExpressionController>(
         id: "constant-editor",
-        init: GraphController(),
+        init: ExpressionController(),
         builder: (_) {
           return Expander(
               header: Text('参数设置'),
