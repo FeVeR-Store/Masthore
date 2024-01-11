@@ -7,12 +7,14 @@ import 'package:masthore/function_list.dart';
 import 'package:masthore/libs/expression.dart';
 import 'package:masthore/main.dart';
 
+enum BottomBarView { functionList, constantEditor }
+
 class BottomBarController extends GetxController {
   late BottomBarWithSheetController controller;
   int currtentView = 0;
   double cumulative = 0;
   double itemBarHeight = 0;
-  late double top;
+  late double glideHeight;
   late double Function() getSheetChildHeight;
   late double Function() getLatexHeight;
   late double Function() getSliderHeight;
@@ -23,7 +25,7 @@ class BottomBarController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    top = 0;
+    glideHeight = 0;
     controller =
         BottomBarWithSheetController(initialIndex: 0, sheetOpened: true);
   }
@@ -37,7 +39,7 @@ class BottomBarController extends GetxController {
   }
 
   void shrink() {
-    setTop(_minHeight);
+    setGlideHeight(_minHeight);
   }
 
   void setTransparent(bool state) {
@@ -45,8 +47,8 @@ class BottomBarController extends GetxController {
     update();
   }
 
-  void setTop(double top) {
-    this.top = top;
+  void setGlideHeight(double top) {
+    this.glideHeight = top;
     update();
   }
 
@@ -65,27 +67,27 @@ class BottomBarController extends GetxController {
   void changeTopByDrag(double y) {
     if (currtentView != 0 &&
         Get.find<ExpressionController>().expressionContext.expression != null &&
-        Get.find<ConstantInputController>().showSlider) {
+        Get.find<ConstantInputController>().isShowSlider) {
       return;
     }
     cumulative += y;
     if (cumulative.abs() > screen.height * .15) {
-      top = top + cumulative;
-      if (top >= _minHeight) {
-        top = _minHeight;
+      glideHeight = glideHeight + cumulative;
+      if (glideHeight >= _minHeight) {
+        glideHeight = _minHeight;
       }
       update();
       cumulative = 0;
     }
   }
 
-  void changeView(int id) {
-    currtentView = id;
-    if (top >= _minHeight - 200) {
-      top = 0;
+  void changeView(BottomBarView view) {
+    currtentView = view.index;
+    if (glideHeight >= _minHeight - 200) {
+      glideHeight = 0;
     }
     update();
-    controller.selectItem(id);
+    controller.selectItem(view.index);
   }
 }
 
@@ -108,9 +110,9 @@ class BottomBar extends StatelessWidget {
                   controller: _.controller,
                   onSelectItem: (int id) {
                     if (id != _.currtentView) {
-                      _.changeView(id);
+                      _.changeView(BottomBarView.values[id]);
                     } else {
-                      _.setTop(0);
+                      _.setGlideHeight(0);
                     }
                   },
                   duration: const Duration(milliseconds: 200),
@@ -119,7 +121,7 @@ class BottomBar extends StatelessWidget {
                       children: [
                         FilledButton.tonal(
                           onPressed: () {
-                            _.setTop(0);
+                            _.setGlideHeight(0);
                           },
                           style: ButtonStyle(
                             fixedSize:
@@ -174,7 +176,7 @@ class BottomBar extends StatelessWidget {
                           ? MainButtonPosition.left
                           : MainButtonPosition.right,
                       heightClosed: 90,
-                      heightOpened: size.height * .7 - _.top,
+                      heightOpened: size.height * .7 - _.glideHeight,
                       selectedItemIconColor: Colors.transparent,
                       itemIconColor: transparent ? Colors.transparent : null,
                       contentPadding: const EdgeInsets.only(top: 15),

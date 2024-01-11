@@ -8,8 +8,8 @@ import 'package:masthore/bottom_bar.dart';
 import "package:masthore/bottom_bar_windows.dart" as windows;
 
 import 'package:masthore/graph.dart';
-export 'package:masthore/libs/rust_bridge.dart' show api;
 import 'package:get_storage/get_storage.dart';
+import 'package:masthore/libs/rust_api/frb_generated.dart';
 import 'package:system_theme/system_theme.dart';
 
 void main() async {
@@ -17,6 +17,7 @@ void main() async {
   await GetStorage.init();
   // 初始化system account，用于获取强调色
   await SystemTheme.accentColor.load();
+  await RustLib.init();
   runApp(const Masthore());
 }
 
@@ -82,6 +83,7 @@ class Masthore extends StatelessWidget {
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
+  final double scale = 1;
   @override
   Widget build(BuildContext context) {
     return KeyboardSizeProvider(

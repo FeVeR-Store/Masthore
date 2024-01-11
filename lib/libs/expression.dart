@@ -1,8 +1,8 @@
 import 'package:get/get.dart';
 import 'package:masthore/bottom_bar.dart';
-import 'package:masthore/function_list.dart';
 import 'package:masthore/graph.dart';
-import 'package:masthore/libs/rust_api.dart';
+import 'package:masthore/libs/rust_api/api.dart';
+import 'package:masthore/libs/rust_api/libs/expression.dart';
 
 class ExpressionContext {
   int id = 1;

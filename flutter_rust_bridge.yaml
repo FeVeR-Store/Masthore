@@ -1,0 +1,2 @@
+rust_input: native/src/api.rs
+dart_output: lib/libs/rust_api

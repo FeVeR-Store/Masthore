@@ -9,25 +9,28 @@ import 'package:keyboard_height_plugin/keyboard_height_plugin.dart';
 import 'package:latext/latext.dart';
 import 'package:masthore/bottom_bar.dart';
 import 'package:masthore/libs/expression.dart';
-import 'package:masthore/libs/rust_api.dart';
+import 'package:masthore/libs/rust_api/libs/expression.dart';
+
 import 'package:masthore/main.dart';
 import 'package:flutter_xlider/flutter_xlider.dart';
 
+/* 常量编辑器 */
 class Editor extends StatelessWidget {
   const Editor({super.key});
   @override
   Widget build(BuildContext context) {
     // Size size = MediaQuery.of(context).size;
     return GetBuilder<ExpressionController>(
-        id: "constant-editor",
-        init: ExpressionController(),
+        id: "constant-editor", // 标记id
+        init: ExpressionController(), // 表达式controller
         builder: (_) {
           return Padding(
               padding: const EdgeInsets.only(top: 30),
               child: ListView(
-                // controller: ScrollController(),
                 children: [
-                  EditorLatexPanel(exp: _),
+                  // 函数表达式
+                  LatexPanel(exp: _),
+                  // 常量列表
                   ..._.expressionContext.constant.map((e) => ConstantInput(
                       identity: e.identity, value: e.value, constant: e))
                 ],
@@ -36,121 +39,174 @@ class Editor extends StatelessWidget {
   }
 }
 
-class EditorLatexPanel extends StatelessWidget {
+/* 函数表达式 */
+class LatexPanel extends StatelessWidget {
   final ExpressionController exp;
-  const EditorLatexPanel({super.key, required this.exp});
+  const LatexPanel({super.key, required this.exp});
   @override
   Widget build(BuildContext context) {
+    // 传递给底栏本组件的高度，用于计算滑动条的位置
     Get.find<BottomBarController>()
         .setGetLatexHeight(() => context.size!.height);
     return Center(
         child: exp.expressionContext.expression != null
+            // 函数若不为空，则展示函数表达式
             ? LaTexT(
                 laTeXCode: Text(
-                exp.expressionContext.expression!.latexString,
+                exp.expressionContext.expression!.latex,
                 style: const TextStyle(fontSize: 22),
               ))
+            // 若为空，提醒
             : FilledButton.icon(
                 icon: const Icon(Icons.keyboard_arrow_left),
                 label: const Text("先选择一个函数吧"),
                 onPressed: () {
-                  Get.find<BottomBarController>().changeView(0);
+                  // 返回函数选择页面
+                  Get.find<BottomBarController>()
+                      .changeView(BottomBarView.functionList);
                 },
               ));
   }
 }
 
+/* 常量输入controller */
 class ConstantInputController extends GetxController {
-  bool showSlider = false;
+  // 是否显示滑动条
+  bool isShowSlider = false;
+  // 用于确认改变的常量
   String identity = "";
+  // 键盘高度
   double keyboardHeight = 0;
-  double oldBottomBarTop = 0;
+  // 原底栏下降高度，用于在隐藏滑动条时恢复原高度
+  double oldGlideHeight = 0;
+  // 是否在滑动，用于隐藏底栏，更大范围展示函数图像的变化
   bool isSliding = false;
-  bool hideKeyboard = true;
+  // 键盘是否收起（目前没有用到）
+  // bool hideKeyboard = true;
+  // 当前的聚焦点，用于点击外部时收起键盘，以及活动完毕后重新聚焦（后者在更换滑动条组件后去除，因为新组件不再抢占焦点）
   FocusNode? currentFocusNode;
   @override
+  // 初始化
   void onInit() {
     super.onInit();
+    // 监听键盘高度变化
     KeyboardHeightPlugin().onKeyboardHeightChanged((height) {
+      // 当高度小于已经记录的键盘高度时，表示键盘仍然在弹出
       if (height > keyboardHeight) {
+        // 更新键盘高度
         keyboardHeight = height;
       }
+      // 如果键盘高度为0，表示键盘已经收起
       if (height == 0) {
-        hideKeyboard = true;
-        closeSlider();
+        // hideKeyboard = true;
+        closeSlider(); // 当键盘收起时，关闭滑动条
+      } else {
+        // hideKeyboard = false;
       }
     });
   }
 
+  // controller移除时，将聚焦点设为空
   @override
   void onClose() {
     currentFocusNode = null;
     super.onClose();
   }
 
+  // 设置聚焦点
   void setFocusNode(FocusNode node) {
     currentFocusNode = node;
   }
 
+  // 聚焦
   void focusOnTextField() {
     currentFocusNode?.requestFocus();
   }
 
+  // 设置滑动状态
   void setSlidState(bool state) {
-    isSliding = state;
+    // 是否正在滑动
+    if (state != isSliding) {
+      isSliding = state;
+      // 将底栏设置为透明/取消透明
+      Get.find<BottomBarController>().setTransparent(isSliding);
+    }
+    // 更新视图
     update();
-    Get.find<BottomBarController>().setTransparent(isSliding);
   }
 
-  void changeShowSlider(String identity, double input, bool noKeyboard) {
+  // 显示滑动条
+  void showSlider(String identity, double input, bool noKeyboard) {
+    // 获取屏幕尺寸
     MediaQueryData mediaQueryData = MediaQuery.of(globalKey.currentContext!);
+    // 如果有键盘并且平台时安卓或ios之一
     if (!noKeyboard &&
-        (Platform.isAndroid || Platform.isIOS || Platform.isFuchsia) &&
+        (Platform.isAndroid || Platform.isIOS) &&
         mediaQueryData.viewInsets.bottom == 0) {
+      // 使用Future，可以执行延时时停止本次函数，如果不停止就无法再次调用
       Future(() {
+        // 如果键盘未弹出，延时200ms后重新执行显示滑动条函数
         if (keyboardHeight == 0) {
           sleep(Durations.short4);
         }
-        changeShowSlider(identity, input, noKeyboard);
+        showSlider(identity, input, noKeyboard);
       });
+      // 停止本函数
       return;
     }
+    // 设置为当前常量的identity
     this.identity = identity;
-    showSlider = true;
+    // 表示显示滑动条
+    isShowSlider = true;
+    // 因为下面要用许多属性，所以储存为临时变量
     BottomBarController bottomBarController = Get.find<BottomBarController>();
-    oldBottomBarTop = bottomBarController.top;
-    // double keyBoardHeight = mediaQueryData.viewInsets.bottom;
+    // 设置原底栏下降高度
+    oldGlideHeight = bottomBarController.glideHeight;
+    // 滑动条高度
     double sliderHeight = 50;
+    // 函数表达式的高度
     double latexHeight = bottomBarController.getLatexHeight();
-    double sheetBarHeight = mediaQueryData.size.height * .7;
-    double sheetItemHeight = (sheetBarHeight - bottomBarController.top) -
-        bottomBarController.getSheetChildHeight();
-    bottomBarController.setTop(sheetBarHeight -
+    // 底栏总高度
+    double bottomHeight = mediaQueryData.size.height * .7;
+    // 底栏按钮区域 = (底栏高度 - 底栏下降高度) - 底栏view高度
+    double bottomBarBtnPanelHeight =
+        (bottomHeight - bottomBarController.glideHeight) -
+            bottomBarController.getSheetChildHeight();
+    // 设置下降高度
+    bottomBarController.setGlideHeight(bottomHeight -
         ((noKeyboard ? 0 : keyboardHeight) +
             sliderHeight +
             input +
             latexHeight +
-            sheetItemHeight +
+            bottomBarBtnPanelHeight +
             40 +
             30 +
-            5));
+            5)); // TODO：魔法数字消除
     update();
   }
 
+  // 关闭滑动条
   void closeSlider() {
-    FocusManager.instance.primaryFocus!.unfocus();
-    currentFocusNode?.unfocus();
-    Get.find<BottomBarController>().setTop(oldBottomBarTop);
+    // FocusManager.instance.primaryFocus!.unfocus();
+    // currentFocusNode?.unfocus();
+    // 恢复原高度
+    Get.find<BottomBarController>().setGlideHeight(oldGlideHeight);
+    // 重置常量identity
     identity = "";
-    showSlider = false;
+    // 表示隐藏滑动条
+    isShowSlider = false;
     update();
   }
 }
 
+/* 常量输入 */
 @immutable
 class ConstantInput extends StatelessWidget {
+  // 常量identity
   final String identity;
+  // 常量的值
   final double value;
+  // 常量
   final Constant constant;
   const ConstantInput(
       {super.key,
@@ -160,33 +216,34 @@ class ConstantInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetBuilder<ConstantInputController>(
-        init: ConstantInputController(),
-        builder: (_) => !_.showSlider || _.identity == identity
-            ? Column(children: [
-                Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Input(
-                      value: value,
-                      identity: identity,
-                      constantInputController: _,
-                      constant: constant,
-                    )),
-                _.showSlider && _.identity == identity
-                    ? ConstantInputSlider(
-                        identity: identity,
-                        controller: _,
-                        value: value,
-                        constant: constant,
-                      )
-                    : const Divider(
-                        color: Colors.transparent,
-                        height: 0,
-                      )
-              ])
-            : const Divider(
-                color: Colors.transparent,
-                height: 0,
-              ));
+        init: ConstantInputController(), // 常量输入controller
+        builder: (_) =>
+            !_.isShowSlider || _.identity == identity // 若没有显示滑动条，那么显示
+                ? Column(children: [
+                    Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Input(
+                          value: value,
+                          identity: identity,
+                          constantInputController: _,
+                          constant: constant,
+                        )),
+                    _.isShowSlider && _.identity == identity
+                        ? ConstantInputSlider(
+                            identity: identity,
+                            controller: _,
+                            value: value,
+                            constant: constant,
+                          )
+                        : const Divider(
+                            color: Colors.transparent,
+                            height: 0,
+                          )
+                  ])
+                : const Divider(
+                    color: Colors.transparent,
+                    height: 0,
+                  ));
   }
 }
 
@@ -334,13 +391,13 @@ class Input extends StatelessWidget {
                     Future(() {
                       // Get.find<ConstantInputController>()
                       //     .setFocusNode(focusNode);
-                      constantInputController.changeShowSlider(
+                      constantInputController.showSlider(
                           identity, context.size?.height ?? 100, true);
                     });
                   },
                   onTapOutside: (__) {
                     if (!constantInputController.isSliding &&
-                        constantInputController.showSlider) {
+                        constantInputController.isShowSlider) {
                       double dy = __.position.dy;
                       if (dy >
                               res.screenHeight - res.keyboardHeight - 50 - 10 &&
@@ -425,7 +482,7 @@ class Input extends StatelessWidget {
                   Future(() {
                     inputController.changeReadonly(identity, false);
                     Get.find<ConstantInputController>().setFocusNode(focusNode);
-                    constantInputController.changeShowSlider(
+                    constantInputController.showSlider(
                         identity, context.size?.height ?? 100, false);
                   });
                 },

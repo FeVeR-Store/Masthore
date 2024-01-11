@@ -1,11 +1,16 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:latext/latext.dart';
 import 'package:masthore/libs/graphics.dart';
 import 'package:masthore/libs/painter.dart';
 
 Offset coordinateToOffset(double dx, double dy) {
   return Offset(dx, -dy);
+}
+
+LaTexT toLatex(String latex) {
+  return LaTexT(laTeXCode: Text(latex));
 }
 
 extension PaintExtension on Canvas {

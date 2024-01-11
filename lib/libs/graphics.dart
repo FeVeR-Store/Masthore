@@ -6,7 +6,9 @@ import 'package:get/get.dart';
 import 'package:masthore/bottom_bar.dart';
 import 'package:masthore/libs/expression.dart';
 import 'package:masthore/libs/painter.dart';
-import 'package:masthore/libs/rust_api.dart';
+
+import 'package:masthore/libs/rust_api/api.dart';
+import 'package:masthore/libs/rust_api/libs/expression.dart';
 import 'package:masthore/libs/utils.dart';
 import 'package:masthore/main.dart';
 
@@ -39,7 +41,7 @@ Graphic newFunction(ExpressionContext context, double width, double height,
     // cacheController.reset();
     return empty();
   }
-  CalcReturnForDart calcReturnForDart = api.draw(
+  CalcReturnForDart calcReturnForDart = draw(
       func: context.expression!.name,
       variableBuilder: VariableBuilder(
           identity: "x",
@@ -168,7 +170,7 @@ Graphic newGrid(double width, double height, double scale, Offset offset_,
     BottomBarController bottomBarController = Get.find<BottomBarController>();
     bottomBarHeight = bottomBarController.transparent
         ? 0
-        : height * .7 - bottomBarController.top;
+        : height * .7 - bottomBarController.glideHeight;
   } else {
     bottomBarHeight = 0;
   }

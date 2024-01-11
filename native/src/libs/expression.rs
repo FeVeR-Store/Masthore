@@ -203,7 +203,7 @@ pub fn variable(identity: &str) -> f64 {
 // }
 
 pub struct Sample {
-    pub label: String,
+    pub name: String,
     pub expression: fn() -> f64,
     pub latex: String,
     pub description: String,

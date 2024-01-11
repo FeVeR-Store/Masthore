@@ -1,8 +1,6 @@
-import 'dart:io';
-import 'package:flutter_rust_bridge/flutter_rust_bridge.dart';
-import 'package:masthore/libs/rust_api.dart';
+// import 'dart:io';
+// 
+// import 'package:masthore/libs/rust_api/api.dart' as _api;
 
-const base = 'native';
-final path = Platform.isWindows ? '$base.dll' : 'lib$base.so';
-final dylib = loadLibForFlutter(path);
-final api = NativeImpl(dylib);
+// const base = 'native';
+// final path = Platform.isWindows ? '$base.dll' : 'lib$base.so';
