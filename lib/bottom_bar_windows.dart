@@ -17,7 +17,7 @@ class BottomBar extends StatelessWidget {
                   height: 300,
                   child: ListView(
                       // controller: ScrollController(),
-                      children: _.expressionContext.constant
+                      children: _.expressionContext.constantList
                           .map((e) => Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: <Widget>[

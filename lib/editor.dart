@@ -31,7 +31,7 @@ class Editor extends StatelessWidget {
                   // 函数表达式
                   LatexPanel(exp: _),
                   // 常量列表
-                  ..._.expressionContext.constant.map((e) => ConstantInput(
+                  ..._.expressionContext.constantList.map((e) => ConstantInput(
                       identity: e.identity, value: e.value, constant: e))
                 ],
               ));
@@ -463,7 +463,7 @@ class Input extends StatelessWidget {
                       {
                         // 设置值为当前常量的值（常量的值在滑动时会更新）
                         textController.text = Get.find<ExpressionController>()
-                            .getConstant(identity)
+                            .getConstantValue(identity)
                             .toString();
                         // 设置为只读
                         inputController.changeReadonly(identity, true);
@@ -543,7 +543,7 @@ class Input extends StatelessWidget {
                                 .changeConstantToDefault(identity); // 将常量重置为默认值
                             textController.text =
                                 Get.find<ExpressionController>()
-                                    .getConstant(identity)
+                                    .getConstantValue(identity)
                                     .toString(); // 将输入框的值设置为默认值
                           },
                           icon: const Icon(Icons.restart_alt_outlined)), // 图标

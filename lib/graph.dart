@@ -175,28 +175,37 @@ class Graph extends StatelessWidget {
                           painter: GraphPainter(graph.offset, graph.id, [
                             // 绘制细网格，比网格密5被
                             newGrid(
-                                width,
-                                height,
-                                graph.currentScale,
-                                graph.offset,
-                                min(width, height) / graph.fr / 5,
-                                false,
-                                finerPaint),
+                                width: width,
+                                height: height,
+                                scale: graph.currentScale,
+                                offset: graph.offset,
+                                gridWidth: min(width, height) / graph.fr / 5,
+                                withTick: false,
+                                paint: finerPaint),
                             // 绘制网格以及坐标
                             newGrid(
-                                width,
-                                height,
-                                graph.currentScale,
-                                graph.offset,
-                                min(width, height) / graph.fr,
-                                true, // 绘制坐标
-                                thinPaint),
+                                width: width,
+                                height: height,
+                                scale: graph.currentScale,
+                                offset: graph.offset,
+                                gridWidth: min(width, height) / graph.fr,
+                                withTick: true, // 绘制坐标
+                                paint: thinPaint),
                             // 绘制坐标和箭头
-                            newAxis(width, height, graph.offset,
-                                graph.xUnitLength, graph.yUnitLength),
+                            newAxis(
+                                width: width,
+                                height: height,
+                                offset: graph.offset,
+                                xUnitLength: graph.xUnitLength,
+                                yUnitLength: graph.yUnitLength),
                             // 绘制函数图像
-                            newFunction(exp.expressionContext, width, height,
-                                graph.offset, graph.currentScale)
+                            newFunction(
+                                context: exp.expressionContext,
+                                width: width,
+                                height: height,
+                                offset: graph.offset,
+                                fr: graph.fr,
+                                scale: graph.currentScale)
                           ]),
                         );
                       }));

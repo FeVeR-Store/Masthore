@@ -1,17 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:masthore/main.dart';
 
-Paint Function() createPaint(double width, Color Function() getColor) {
+/* 创建Paint */
+Paint Function() createPaint(
+    {required double width,
+    required Color Function() color,
+    PaintingStyle paintingStyle = PaintingStyle.stroke}) {
   return () => Paint()
-    ..color = getColor()
+    ..color = color()
     ..strokeWidth = width
-    ..style = PaintingStyle.stroke
-    ..isAntiAlias = true
+    ..style = paintingStyle
+    ..isAntiAlias = true // 抗锯齿
     ..strokeCap = StrokeCap.round;
 }
 
-final ColorScheme colors = Theme.of(globalKey.currentContext!).colorScheme;
-Color Function() getTheme(String color) {
+// 主题颜色
+final ColorScheme colors = theme.colorScheme;
+
+// 获取颜色
+Color Function() getColor(String color) {
+  // 使用函数是为了在切换深/浅色模式时能切换颜色
   return () =>
       (Theme.of(globalKey.currentContext!).brightness == Brightness.dark
           ? {
@@ -26,7 +34,15 @@ Color Function() getTheme(String color) {
             })[color]!;
 }
 
-final Paint Function() thinPaint = createPaint(1, getTheme('grey'));
-final Paint Function() finerPaint = createPaint(0.25, getTheme('grey'));
-final Paint Function() painter = createPaint(2, (getTheme('primary')));
-final Paint Function() lightPainer = createPaint(2, (getTheme('light')));
+// 细线
+final Paint Function() thinPaint =
+    createPaint(width: 1, color: getColor('grey'));
+// 更细的线
+final Paint Function() finerPaint =
+    createPaint(width: 0.25, color: getColor('grey'));
+// 主要的线
+final Paint Function() painter =
+    createPaint(width: 2, color: getColor('primary'));
+// 浅色线
+final Paint Function() lightPainer =
+    createPaint(width: 2, color: getColor('light'));

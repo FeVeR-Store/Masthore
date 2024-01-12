@@ -1,2 +1,2 @@
-rust_input: native/src/api.rs
+rust_input: rust/src/api.rs
 dart_output: lib/libs/rust_api
