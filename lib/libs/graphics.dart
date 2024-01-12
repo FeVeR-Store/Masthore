@@ -14,17 +14,7 @@ import 'package:masthore/main.dart';
 
 enum GraphicsTypes { text, path, line, point, empty, multi }
 
-double reviseY(double y) {
-  return -y;
-}
-
 int oldId = 0;
-
-class Range {
-  double min;
-  double max;
-  Range(this.min, this.max);
-}
 
 Graphic newFunction(ExpressionContext context, double width, double height,
     Offset offset, double scale) {

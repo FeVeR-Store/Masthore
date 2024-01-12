@@ -9,6 +9,10 @@ Offset coordinateToOffset(double dx, double dy) {
   return Offset(dx, -dy);
 }
 
+double reviseY(double y) {
+  return -y;
+}
+
 LaTexT toLatex(String latex) {
   return LaTexT(laTeXCode: Text(latex));
 }

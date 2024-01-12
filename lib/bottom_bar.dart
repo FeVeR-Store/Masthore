@@ -143,7 +143,7 @@ class BottomBar extends StatelessWidget {
                   // 点击按钮切换时
                   onSelectItem: (int index) {
                     // 如果切换的视图与现在不同
-                    if (index == _.currtentView.index) {
+                    if (index != _.currtentView.index) {
                       // 那么就切换视图
                       _.changeView(BottomBarView.values[index]);
                     }
