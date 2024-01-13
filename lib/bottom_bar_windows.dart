@@ -12,7 +12,7 @@ class BottomBar extends StatelessWidget {
         init: ExpressionController(),
         builder: (_) {
           return Expander(
-              header: Text('参数设置'),
+              header: const Text('参数设置'),
               content: SizedBox(
                   height: 300,
                   child: ListView(
@@ -22,9 +22,9 @@ class BottomBar extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: <Widget>[
                                   SizedBox(
-                                    child: LaTexT(laTeXCode: Text(e.identity)),
                                     width: 50.0,
                                     height: 50.0,
+                                    child: LaTexT(laTeXCode: Text(e.identity)),
                                   ),
                                   TextBox(
                                     controller: TextEditingController(),

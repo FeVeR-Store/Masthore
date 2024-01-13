@@ -11,10 +11,6 @@ pub fn get_sample() -> &'static mut Vec<Sample> {
         title: "基本函数".to_string(),
         description: "基本函数".to_string(),
     };
-    let better = Owner{
-        title: "高级函数".to_string(),
-        description: "高级函数".to_string(),
-    };
     let single = Owner {
         title: "".to_string(),
         description: "".to_string(),
@@ -42,7 +38,7 @@ pub fn get_sample() -> &'static mut Vec<Sample> {
             latex: "$asin(bx+c)+d$".to_string(),
             description: "正弦函数曲线".to_string(),
             avatar: "sin".to_string(),
-            owner: better.clone(),
+            owner: base.clone(),
         },
         Sample {
             name: "tan".to_string(),
@@ -50,7 +46,7 @@ pub fn get_sample() -> &'static mut Vec<Sample> {
             latex: "$atan(bx+c)+d$".to_string(),
             description: "正切函数曲线".to_string(),
             avatar: "tan".to_string(),
-            owner: better.clone(),
+            owner: base.clone(),
         },
     ];
 

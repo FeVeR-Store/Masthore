@@ -41,7 +41,7 @@ fn variable(name: &str) -> f64
 
 ```rust
 struct Sample {
-    label: String,
+    name: String,
     expression: fn(f64) -> f64,
     latex: String,
     description: String,
@@ -50,7 +50,7 @@ struct Sample {
 }
 ```
 
-- label：函数的唯一标识符（也就是函数的名字，但是必须是唯一的）。
+- name：函数的唯一标识符（也就是函数的名字，但是必须是唯一的）。
 - expression：函数的具体实现（就是写的 rust 函数）。
 - latex：函数的 LaTeX 表达式。
 - description：函数的描述。
@@ -84,6 +84,8 @@ math::tan(x); // tan(x)
 math::log(a,x); // log(a)(x)
 ```
 
+_注：math中的函数是通过rust `f64`类型的方法实现的，比如`math::sin(x)`实际调用的是`x.sin()`_
+
 ### 使用示例
 
 ```rust
@@ -108,7 +110,7 @@ fn cos() {
 
 // 定义 Sample
 Sample {
-    label: "cos".to_string(), //由于Sample接受的类型为String，因此需要使用to_string()转换
+    name: "cos".to_string(), //由于Sample接受的类型为String，因此需要使用to_string()转换
     expression: cos, // 函数的具体实现
     latex: "$acos(bx+c)+d$".to_string(), // 函数的 LaTeX 表达式
     description: "正弦函数曲线".to_string(), // 函数的描述

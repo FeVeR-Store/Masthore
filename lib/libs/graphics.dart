@@ -18,10 +18,12 @@ enum GraphicType { text, path, line, point, empty, multi }
 // 用于确认是否更新函数
 int oldId = 0;
 
+// 渲染时的长度转数学计算时的长度
 double renderLengthToMathLength(double renderLength, double unitLength) {
   return renderLength / unitLength;
 }
 
+// 数学计算时的长度转渲染时的长度
 double mathLengthToRenderLength(double mathLength, double unitLength) {
   return mathLength * unitLength;
 }
